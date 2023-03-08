@@ -4,3 +4,4 @@ classifier/dataset/**/*.png
 classifier/dataset/*.mp4
 classifier/dataset/unclean_data
 *.npy
+**/.vscode/

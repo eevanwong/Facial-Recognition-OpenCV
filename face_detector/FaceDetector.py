@@ -24,24 +24,24 @@ class FaceDetector:
 
             cv.rectangle(frame, (box[0], box[1]), (box[2], box[3]), (0, 255, 0), 2)
 
-            cv.putText(
-                frame,
-                str(prob),
-                (box[2], box[3]),
-                cv.FONT_HERSHEY_COMPLEX_SMALL,
-                1,
-                (0, 0, 255),
-                1,
-                cv.LINE_AA,
-                False,
-            )  # placed in the bottom left?
+            # cv.putText(
+            #     frame,
+            #     str(prob),
+            #     (box[2], box[3]),
+            #     cv.FONT_HERSHEY_COMPLEX_SMALL,
+            #     1,
+            #     (0, 0, 255),
+            #     1,
+            #     cv.LINE_AA,
+            #     False,
+            # )  # placed in the bottom left?
 
             # Draw landmarks
-            cv.circle(frame, tuple(ldm[0]), 5, (0, 0, 255), -1)
-            cv.circle(frame, tuple(ldm[1]), 5, (0, 0, 255), -1)
-            cv.circle(frame, tuple(ldm[2]), 5, (0, 0, 255), -1)
-            cv.circle(frame, tuple(ldm[3]), 5, (0, 0, 255), -1)
-            cv.circle(frame, tuple(ldm[4]), 5, (0, 0, 255), -1)
+            # cv.circle(frame, tuple(ldm[0]), 5, (0, 0, 255), -1)
+            # cv.circle(frame, tuple(ldm[1]), 5, (0, 0, 255), -1)
+            # cv.circle(frame, tuple(ldm[2]), 5, (0, 0, 255), -1)
+            # cv.circle(frame, tuple(ldm[3]), 5, (0, 0, 255), -1)
+            # cv.circle(frame, tuple(ldm[4]), 5, (0, 0, 255), -1)
         return frame
 
     def detect_ROI(self, boxes):
@@ -63,32 +63,24 @@ class FaceDetector:
         kW = int(w / factor)
         kH = int(h / factor)
 
-        # Why does it need to be odd?
-        # if kW % 2 == 0:
-        #     kW -= 1
-
-        # if kH % 2 == 0:
-        #     kH -= 1
         return cv.GaussianBlur(img, (kW, kH), 0)
 
     def _is_it_me(self, face):
         # running classifier on face
-
         rgb = cv.cvtColor(face, cv.COLOR_BGR2RGB)
-        PIL_img = Image.fromarray(rgb.astype("uint8"), "RGB")
+        pil_img = Image.fromarray(rgb.astype("uint8"), "RGB")
 
         # need to augment it such that
         preprocess = transforms.Compose(
             [
                 transforms.Resize(224),
-                transforms.Normalize(
-                    [0.485, 0.456, 0.406], [0.229, 0.224, 0.225]
-                ),  # in normalize fn, 1st array is the mean, 2nd is the std
+                transforms.ToTensor(),
+                transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
             ]
         )
         # Using mean and std of imagenet is a common practice that helps with fine-tuning the performance of the pretrained model
 
-        preprocessed_img = preprocess(PIL_img)
+        preprocessed_img = preprocess(pil_img)
 
         # torch.unsqueeze creates a tensor from the processed image with a dimension size of one insertted at index 0
         batch_t = torch.unsqueeze(preprocessed_img, 0)
@@ -97,7 +89,7 @@ class FaceDetector:
             _, pred = torch.max(out, 1)
 
         prediction = np.array(pred[0])
-        if prediction == 0:
+        if prediction == 1:
             return True
         else:
             return False
@@ -116,7 +108,7 @@ class FaceDetector:
 
                 if blur:
                     # get ROI
-                    ROIs = self.detectROI(boxes)
+                    ROIs = self.detect_ROI(boxes)
                     for ROI in ROIs:
                         (startY, endY, startX, endX) = ROI
                         face = frame[startY:endY, startX:endX]

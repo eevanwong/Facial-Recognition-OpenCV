@@ -36,9 +36,9 @@ class Data(Dataset):
         img = self.datafile[idx][0]  # img
         y = int(self.datafile[idx][1])  # label
         if y == 0:
-            label = torch.tensor([1, 0, 0, 0])  # converting the int label to a tensor
+            label = torch.tensor([1.0, 0.0])  # converting the int label to a tensor
         if y == 1:
-            label = torch.tensor([0, 0, 1, 0])
+            label = torch.tensor([0.0, 1.0])
         return img, label
 
 
@@ -92,8 +92,19 @@ optimizer_conv = optim.Adam(
 # StepLR scheduler is used here, multiplies learning rate by 'gamma' after every 'step_size' num of epochs
 exp_lr_scheduler = lr_scheduler.StepLR(optimizer_conv, step_size=7, gamma=0.1)
 
+# # Testing with one batch
 
-def train_model(model, optimizer, criterion, scheduler, num_epochs=25):
+# image, label = next(iter(dataloaders["val"]))
+
+# outputs = model_conv(image)
+# value, preds = torch.max(outputs, 1)
+
+# print(outputs)
+# print(label)
+# loss = criterion(outputs, label)
+
+
+def train_model(model, optimizer, criterion, scheduler, num_epochs=10):
     since = time.time()
     best_model_wts = copy.deepcopy(model.state_dict())
     best_acc = 0.0
@@ -114,20 +125,21 @@ def train_model(model, optimizer, criterion, scheduler, num_epochs=25):
             running_corrects = 0
 
             for inputs, labels in dataloaders[phase]:
-                inputs = inputs.to(device)
-                labels = labels.to(device)
+                inputs = inputs.to(device)  # moves inputs tensor (img) to the device
+                labels = labels.to(device)  # moves labels tensor to the device ("GPU")
 
                 # zero parameter gradients
                 optimizer.zero_grad()
 
+                # Use both forward and backward propagation during training to update the model weights and minimize the training loss
+                # only use forward propagation during evaluation to get the predictions of the model on the evaluation data and calculate the evaluation loss and accuracy.
+
                 # forward learning
-                # track history if only in train
                 with torch.set_grad_enabled(phase == "train"):
                     outputs = model(inputs)
                     value, preds = torch.max(outputs, 1)
                     loss = criterion(outputs, labels)
 
-                    # backward learning + optimize only if in training phase
                     if phase == "train":
                         loss.backward()
                         optimizer.step()
@@ -140,6 +152,7 @@ def train_model(model, optimizer, criterion, scheduler, num_epochs=25):
             if phase == " train":
                 scheduler.step()
 
+            # The best model weights are updated if the validation accuracy is better than the prev best accuracy
             epoch_loss = running_loss / dataset_sizes[phase]
             epoch_acc = running_corrects.double() / dataset_sizes[phase]
 
@@ -150,14 +163,14 @@ def train_model(model, optimizer, criterion, scheduler, num_epochs=25):
                 best_acc = epoch_acc
                 best_model_wts = copy.deepcopy(model.state_dict())
 
-        time_elapsed = time.time() - since
-        print(f"Training complete in {time_elapsed // 60}m {time_elapsed % 60}s")
+    time_elapsed = time.time() - since
+    print(f"Training complete in {time_elapsed // 60}m {time_elapsed % 60}s")
 
-        print(f"Best val Acc: {best_acc}")
+    print(f"Best val Acc: {best_acc}")
 
-        # load best model weights
-        model.load_state_dict(best_model_wts)
-        return model
+    # load best model weights
+    model.load_state_dict(best_model_wts)
+    return model
 
 
 model_conv = train_model(

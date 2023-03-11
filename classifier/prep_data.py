@@ -48,7 +48,7 @@ for img, label in image_datasets["validation"]:
     val_data.append([np.array(img), np.array(label)])
 
 val_data_np = np.array(val_data, dtype=object)
-print(val_data)
+print(val_data[1])
 np.save(
     "C:/Users/Evan/OneDrive - University of Waterloo/Desktop/MLProjects/FaceDetectionApp/classifier/"
     + "val_data"

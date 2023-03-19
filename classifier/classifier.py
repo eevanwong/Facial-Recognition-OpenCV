@@ -92,17 +92,6 @@ optimizer_conv = optim.Adam(
 # StepLR scheduler is used here, multiplies learning rate by 'gamma' after every 'step_size' num of epochs
 exp_lr_scheduler = lr_scheduler.StepLR(optimizer_conv, step_size=7, gamma=0.1)
 
-# # Testing with one batch
-
-# image, label = next(iter(dataloaders["val"]))
-
-# outputs = model_conv(image)
-# value, preds = torch.max(outputs, 1)
-
-# print(outputs)
-# print(label)
-# loss = criterion(outputs, label)
-
 
 def train_model(model, optimizer, criterion, scheduler, num_epochs=10):
     since = time.time()

@@ -24,24 +24,24 @@ class FaceDetector:
 
             cv.rectangle(frame, (box[0], box[1]), (box[2], box[3]), (0, 255, 0), 2)
 
-            # cv.putText(
-            #     frame,
-            #     str(prob),
-            #     (box[2], box[3]),
-            #     cv.FONT_HERSHEY_COMPLEX_SMALL,
-            #     1,
-            #     (0, 0, 255),
-            #     1,
-            #     cv.LINE_AA,
-            #     False,
-            # )  # placed in the bottom left?
+            cv.putText(
+                frame,
+                str(prob),
+                (box[2], box[3]),
+                cv.FONT_HERSHEY_COMPLEX_SMALL,
+                1,
+                (0, 0, 255),
+                1,
+                cv.LINE_AA,
+                False,
+            )  # placed in the bottom left?
 
             # Draw landmarks
-            # cv.circle(frame, tuple(ldm[0]), 5, (0, 0, 255), -1)
-            # cv.circle(frame, tuple(ldm[1]), 5, (0, 0, 255), -1)
-            # cv.circle(frame, tuple(ldm[2]), 5, (0, 0, 255), -1)
-            # cv.circle(frame, tuple(ldm[3]), 5, (0, 0, 255), -1)
-            # cv.circle(frame, tuple(ldm[4]), 5, (0, 0, 255), -1)
+            cv.circle(frame, tuple(ldm[0]), 5, (0, 0, 255), -1)
+            cv.circle(frame, tuple(ldm[1]), 5, (0, 0, 255), -1)
+            cv.circle(frame, tuple(ldm[2]), 5, (0, 0, 255), -1)
+            cv.circle(frame, tuple(ldm[3]), 5, (0, 0, 255), -1)
+            cv.circle(frame, tuple(ldm[4]), 5, (0, 0, 255), -1)
         return frame
 
     def detect_ROI(self, boxes):

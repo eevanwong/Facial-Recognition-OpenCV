@@ -6,6 +6,8 @@ This project leverages pretrained model alongside Transfer Learning to give it t
 
 Code is heavily commented from my own learning as I started off completely new to the computer vision and deep learning space.
 
+At 15 Epochs, model garnered an accuracy of ~99% accuracy
+
 ## Setup
 
 The file structure is already setup. You will need to add in the proper files, folder, and paths.
